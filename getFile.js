@@ -14,6 +14,11 @@ const getCurrPath = () => {
     return currPath;
 }
 
+// 格式化路径
+const formatPath = (path) =>{
+    return path.replaceAll(/[\\|\\\\|/]/g, '/')
+}
+
 // 获取项目下src目录的绝对路径
 const getSrcDirPath = () =>{
     const currPath = getCurrPath();
@@ -85,7 +90,7 @@ const getAllFileFromPath = (filePathList) => {
         }
         // 当前为文件，且文件后缀符合条件，则加入解析文件列表
         if (!isDir(absouleFilePath) && isParserFile(fileName)) {
-            deepFileList.push(absouleFilePath);
+            deepFileList.push(formatPath(absouleFilePath));
         }
     }
     return deepFileList;
@@ -125,6 +130,47 @@ const getFileContent = (pathName) => {
     return content
 }
 
+
+// 将js中路径转换成可用的绝对路径
+// 部分路径中扩展名省略，index在文件路径中可省略
+// const errorPath = 'D:/code/umi/analyze/analyzeTSX/src/pages/parser/index'; // 文件不存在
+// const errorPath = 'D:/code/umi/analyze/analyzeTSX/src/pages/parser/index.tsx'; // 是文件
+// const errorPath = 'D:/code/umi/analyze/analyzeTSX/src/pages/parser' // 文件存在，是dir 获取index开头文件
+const getRightPath = (absolutePath) =>{
+
+    // 获取文件夹下文件名为xx的文件绝对路径
+    const getSpecielFIlePath = (dirPath, fileName)=>{
+        const sonPathList = fs.readdirSync(dirPath);
+        for(let lastName of sonPathList){
+            const pointIndex = lastName.lastIndexOf('.');
+            if(lastName.slice(0, pointIndex) == fileName){
+                return path.join(absolutePath, lastName)
+            }
+        }
+    }
+
+    if(!fs.existsSync(absolutePath)){
+        console.log('文件不存在')
+        // 获取路径
+        const dirPath = path.dirname(absolutePath);
+        // 获取文件名
+        const lastName = path.basename(absolutePath);
+        
+        console.log('getFile: lastName, dirPath', lastName, dirPath)
+        
+        return getSpecielFIlePath(dirPath, lastName);
+    }
+    const stats = fs.statSync(absolutePath);
+    if (stats.isFile()) {
+        return absolutePath;
+    } else if (stats.isDirectory()) {
+        return getSpecielFIlePath(absolutePath, 'index')
+    }else{
+        console.log('其他情况:', absolutePath)
+    }
+    return absolutePath;
+}
+
 // 根据导入信息路径获取绝对路径 - ./  @  @@
 // 考虑 ./  ../  @ 等路径
 // 没有"/"的视为公共库，可能存在'anatd/es/form',@ant-design.icons
@@ -143,7 +189,7 @@ const isImportSelf = (packageName) => {
 }
 
 const cutPathArr = (pathUrl) =>{
-    return pathUrl.replaceAll("'", '').replaceAll(/[\\|\\\\|/]/g, ',').split(',');
+    return pathUrl.replace(/\'/g, '').replace(/[\\|\\\\|/]/g, ',').split(',');
 }
 
 // 
@@ -202,23 +248,32 @@ const testFn = () => {
 
     // const s = filePath.replaceAll(/[\\|\\\\|/]/g, ',');
     // console.log(s)
-    const path1 = '@/route/route';
-    console.log('getFile: path1', path1)
-    const res = getSrcDirPath();
-    console.log('getFile: res', res)
+    // const path1 = '@/route/route';
+    // console.log('getFile: path1', path1)
+    // const res = getSrcDirPath();
+    // console.log('getFile: res', res)
     // const filePath =JSON.stringify("D:\code\umi\analyze\analyzeTSX\src\layouts\index.tsx");
     // // const path1 = './yay.jpg';
     // // const filePath = 'D:/code/umi/analyze/analyzeTSX/src/assets/index.tsx';
     // const absoluteFilePath = getImportPath(path1, filePath, '');
     // console.log('getFile: absoluteFilePath', absoluteFilePath)
+
+    // 测试补全路径
+    // const errorPath = 'D:/code/umi/analyze/analyzeTSX/src/pages/parser/index'; // 文件不存在
+    // const errorPath = 'D:/code/umi/analyze/analyzeTSX/src/pages/parser/index.tsx'; // 是文件
+    // const errorPath = 'D:/code/umi/analyze/analyzeTSX/src/pages/parser' // 文件存在，是dir 获取index开头文件
+    const errorPath = 'D:/code/umi/analyze/analyzeTSX/src/pages/docs' // 文件不村子啊
+    const res = getRightPath(errorPath);
+    console.log('getFile: res', res)
 }
 
-// testFn();
+testFn();
 
 module.exports = {
     getCurrPath,
     isParserFile,
     getAllFileFromPath,
     getSrcDirPath,
-    getImportPath
+    getImportPath,
+    isImportSelf
 };

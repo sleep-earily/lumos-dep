@@ -4,7 +4,15 @@ const imp = require("./constant/importInfo");
 const fn = require('./constant/fileNode');
 const getFile = require('./getFile');
 
-
+const getAstInfo = (filePath)=>{
+    const sourceFile = ts.createSourceFile(
+        filePath,
+        fs.readFileSync(filePath).toString(),
+        ts.ScriptTarget.ES2015,
+    /*setParentNodes */ true
+    )
+    return sourceFile;
+}
 // 从一个node节点中解析import信息，存储
 const getImportDeclarationFromNode = (node, filePath, srcPath) => {
     let importInfo;
@@ -20,7 +28,7 @@ const getImportDeclarationFromNode = (node, filePath, srcPath) => {
         const bindsImport = node.importClause?.namedBindings || { elements: [] };
         // names就是解构的变量名
         const names = bindsImport.elements.map(item => item.getText());
-        importInfo = new imp.ImportInfo(absolutePackageName, defaultImport, names.join(','));
+        importInfo = new imp.ImportInfo(absolutePackageName, defaultImport, names.join(','), packageName!==absolutePackageName);
     }
     return importInfo;
 }
@@ -29,12 +37,7 @@ const getImportDeclarationFromNode = (node, filePath, srcPath) => {
 const getImportInfo = (filePath, srcPath) => {
     const importInfoList = []
     // 构建ts解析目录
-    const sourceFile = ts.createSourceFile(
-        filePath,
-        fs.readFileSync(filePath).toString(),
-        ts.ScriptTarget.ES2015,
-    /*setParentNodes */ true
-    )
+    const sourceFile = getAstInfo(filePath);
     ts.forEachChild(sourceFile, (node) => {
         const importInfo = getImportDeclarationFromNode(node, filePath, srcPath);
         // 剔除 其他节点信息
@@ -50,5 +53,6 @@ const getImportInfo = (filePath, srcPath) => {
 
 
 module.exports = {
+    getAstInfo,
     getImportInfo,
 }

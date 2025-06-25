@@ -8,11 +8,13 @@ class ImportInfo {
     // importPath = '';
     defaultImport = '';
     bindsImport = '';
+    isSelfImport = false;
 
-    constructor(packageName, defaultImport, bindsImport) {
+    constructor(packageName, defaultImport, bindsImport, isSelfImport=false) {
         this.packageName = packageName;
         this.defaultImport = defaultImport;
         this.bindsImport = bindsImport;
+        this.isSelfImport = isSelfImport;
     }
     get getPackageName() {
         return this.packageName;
@@ -23,6 +25,9 @@ class ImportInfo {
 
     get getBindsImport() {
         return this.bindsImport;
+    }
+    get isSelfImport(){
+        return this.isSelfImport;
     }
 
 

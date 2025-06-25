@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tree graph</title>
+</head>
+
+<body>
+      <div id="chart" style="width: 800px;height:600px;"></div>
+</body>
+<!-- <script src="../dep/echarts.min.js"></script> -->
+<script src="./echarts.min.js"></script>
+<script src="./a.js"></script>
+<script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<script type="text/javascript">
+
+    var chartDom = document.getElementById('chart');
+    var myChart = echarts.init(document.getElementById('chart'));
+    console.log('index33: echarts', echarts)
+    var option;
+
+    myChart.showLoading();
+    console.log('index33: dataJson', dataJson)
+
+    myChart.hideLoading();
+    option = {
+        title: { text: 'Lumos-Dep 示例图表' },
+          tooltip: {
+            trigger: 'item',
+            triggerOn: 'mousemove'
+          },
+          series: [
+            {
+              type: 'tree',
+              data: [dataJson],
+              left: '2%',
+              right: '2%',
+              top: '8%',
+              bottom: '20%',
+              symbol: 'emptyCircle',
+              orient: 'vertical',
+              expandAndCollapse: true,
+              label: {
+                position: 'top',
+                rotate: -90,
+                verticalAlign: 'middle',
+                align: 'right',
+                fontSize: 9
+              },
+              leaves: {
+                label: {
+                  position: 'bottom',
+                  rotate: -90,
+                  verticalAlign: 'middle',
+                  align: 'left'
+                }
+              },
+              animationDurationUpdate: 750
+            }
+          ]
+        }
+
+    console.log('index33: option', option)
+    myChart.setOption(option);
+
+</script>
+
+</html>

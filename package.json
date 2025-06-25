@@ -1,5 +1,5 @@
 {
-  "name": "anast",
+  "name": "lumos-dep",
   "version": "1.0.0",
   "description": "analyze ts/tsx file dependencies in program",
   "main": "index.js",
@@ -7,12 +7,15 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "ancli": "./index.js"
+    "lumos-dep": "./index.js"
   },
   "author": "zzq",
   "license": "ISC",
   "devDependencies": {
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
   }
 }
